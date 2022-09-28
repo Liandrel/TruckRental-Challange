@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TruckRentalLogicLibrary
 {
-    internal class CarModel
+    public class CarModel
     {
         public string Producent { get; set; }
         public string Model { get; set; }

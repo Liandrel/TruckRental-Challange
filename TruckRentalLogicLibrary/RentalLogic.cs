@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace TruckRentalLogicLibrary
 {
-    internal static class RentalLogic
+    public static class RentalLogic
     {
-        static void PopulateCarList(List<CarModel> CarList)
+        public static void PopulateCarList(List<CarModel> CarList)
         {
             CarList.Add(new CarModel("GMC", "Canyon"));
             CarList.Add(new CarModel("Mitsubishi", "Triton"));
@@ -16,12 +16,12 @@ namespace TruckRentalLogicLibrary
             CarList.Add(new CarModel("Nissan", "Titan"));
             CarList.Add(new CarModel("Volkswagen", "Amarok"));
         }
-        static void RentCar(CarModel car)
+        public static void RentCar(CarModel car)
         {
             car.IsRented = true;
             car.StartRentDate = DateTime.Now;
         }
-        static decimal ReturnCar(CarModel car, DateTime returnRentDate)
+        public static decimal ReturnCar(CarModel car, DateTime returnRentDate)
         {
             decimal output;
 
@@ -36,8 +36,8 @@ namespace TruckRentalLogicLibrary
             decimal output = 0;
 
             TimeSpan timeRented = returnRentDate.Subtract(car.StartRentDate);
-            int hours = timeRented.Minutes / 60;
-            int minutes = timeRented.Minutes % 60;
+            int hours = (int)timeRented.TotalMinutes / 60;
+            int minutes = (int)timeRented.TotalMinutes % 60;
             if(minutes > 10)
             {
                 hours++;
