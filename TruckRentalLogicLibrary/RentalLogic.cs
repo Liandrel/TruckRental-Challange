@@ -26,29 +26,59 @@ namespace TruckRentalLogicLibrary
             decimal output;
 
             car.IsRented = false;
-            output = CalculatePrice(car, returnRentDate);
+            output = CalculateAmmountOwed(car.StartRentDate, returnRentDate);
 
             return output;
         }
 
-        private static decimal CalculatePrice(CarModel car, DateTime returnRentDate)
+        private static decimal CalculateAmmountOwed(DateTime startDate, DateTime endDate)
         {
             decimal output = 0;
 
-            TimeSpan timeRented = returnRentDate.Subtract(car.StartRentDate);
-            int hours = (int)timeRented.TotalMinutes / 60;
-            int minutes = (int)timeRented.TotalMinutes % 60;
-            if(minutes > 10)
-            {
-                hours++;
-            }
-            car.StartRentDate = DateTime.Today;
+            TimeSpan rentalTime = endDate.Subtract(startDate);
 
-            if(hours >= 1)
+            if (rentalTime.TotalMinutes <= Pricing.DiscountedStartMinutes)
             {
-                output = 25;
+                output = Pricing.DiscountedStartPrice;
             }
-            output += --hours * 50;
+            else 
+            {
+                decimal calculatedTotalCostByHourly = Pricing.DiscountedStartPrice + 
+                   ((int)Math.Ceiling((rentalTime.TotalMinutes - Pricing.DiscountedStartMinutes) / 60.0) * Pricing.HourlyRate);
+                if(calculatedTotalCostByHourly <= IdentifyDailyRate(startDate))
+                {
+                    output = calculatedTotalCostByHourly;
+                }
+                else
+                {
+                    TimeSpan rentalDays = endDate.Date.Subtract(startDate.Date);
+                    int totalRentalDays = rentalDays.Days;
+                    if (endDate.Hour >=12)
+                    {
+                        totalRentalDays += 1;
+                    }
+
+                    decimal calculatedDailyPrice = 0;
+
+                    for (int i = 0; i < totalRentalDays; i++)
+                    {
+                        calculatedDailyPrice += IdentifyDailyRate(startDate.AddDays(i));
+                    }
+                    output = calculatedDailyPrice;
+                }
+
+            }
+
+            return output;
+        }
+        private static decimal IdentifyDailyRate(DateTime day)
+        {
+            decimal output = Pricing.dailyWeekdayRate;
+            
+            if(day.DayOfWeek == DayOfWeek.Saturday || day.DayOfWeek == DayOfWeek.Sunday)
+            {
+                output = Pricing.dailyWeekendRate;
+            }
 
             return output;
         }
